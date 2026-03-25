@@ -34,7 +34,7 @@
       --accent2: #16a34a;
       --accent3: #dc2626;
       --text: #1c1710;
-      --muted: #7a6e5a;
+      --muted: #6a5f4e;
       --border: #ddd5c0;
       --nav-blur: rgba(250, 247, 240, 0.95);
       --noise-opacity: 0.18;
@@ -42,7 +42,8 @@
       --orb2-color: rgba(22, 163, 74, 0.05);
       --grid-line: rgba(180, 83, 9, 0.05);
       --stroke-color: var(--text);
-      --contact-stroke: rgba(0, 0, 0, 0.1);
+      /* FIX 2: was rgba(0,0,0,0.1) — nearly invisible on light bg */
+      --contact-stroke: rgba(28, 23, 16, 0.38);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -114,7 +115,8 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 100;
+      /* FIX 1: raised from 100 → 300 so it always sits above the mobile menu overlay (z-index: 150) */
+      z-index: 300;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -165,7 +167,9 @@
       border: none;
       cursor: pointer;
       padding: 6px;
-      z-index: 200;
+      /* FIX 1: ensure button is always clickable above mobile menu */
+      position: relative;
+      z-index: 400;
     }
     .nav-hamburger span {
       display: block;
@@ -420,7 +424,7 @@
       margin-bottom: 1.5rem;
       transition: color 0.3s;
     }
-    [data-theme="light"] .project-num { color: rgba(180, 83, 9, 0.09); }
+    [data-theme="light"] .project-num { color: rgba(180, 83, 9, 0.12); }
     .project-card:hover .project-num { color: rgba(245, 166, 35, 0.22); }
     [data-theme="light"] .project-card:hover .project-num { color: rgba(180, 83, 9, 0.2); }
     .project-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); position: relative; z-index: 2; }
@@ -513,6 +517,7 @@
     [data-theme="light"] .skill-pill.highlight { border-color: rgba(180, 83, 9, 0.35); background: rgba(180, 83, 9, 0.05); }
     #contact { background: var(--bg); position: relative; overflow: hidden; text-align: center; padding: 6rem 4rem; transition: background 0.4s; }
     .contact-big { font-family: "Bebas Neue", sans-serif; font-size: clamp(4rem, 13vw, 12rem); line-height: 0.9; letter-spacing: 2px; margin-bottom: 3rem; }
+    /* FIX 2: stroke text — transparent fill with outlined stroke for "CONNECT" */
     .contact-big .stroke { -webkit-text-stroke: 1.5px var(--contact-stroke); color: transparent; display: block; }
     .contact-links { display: flex; justify-content: center; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
     .contact-link {
@@ -538,6 +543,8 @@
     .ticker-wrap { padding: 1rem 0; background: var(--accent); overflow: hidden; white-space: nowrap; transition: background 0.4s; }
     .ticker { display: inline-flex; animation: ticker 25s linear infinite; }
     .ticker-item { font-family: "Bebas Neue", sans-serif; font-size: 1rem; letter-spacing: 4px; color: var(--bg); padding: 0 2rem; transition: color 0.4s; }
+    /* FIX 3: ticker text on light mode — bg becomes very light, use a dark override */
+    [data-theme="light"] .ticker-item { color: #faf7f0; }
     .ticker-sep { color: rgba(0, 0, 0, 0.3); }
     .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
     .reveal.visible { opacity: 1; transform: translateY(0); }
