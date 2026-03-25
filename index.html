@@ -58,7 +58,7 @@
     pointer-events: none; z-index: 9999; opacity: var(--noise-opacity); transition: opacity 0.4s;
   }
 
-  /* ── CURSOR (desktop only) ── */
+  /* ── CURSOR ── */
   #cursor {
     position: fixed; width: 12px; height: 12px; background: var(--accent);
     border-radius: 50%; pointer-events: none; z-index: 10000;
@@ -235,16 +235,44 @@
   .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; color: var(--accent); line-height: 1; }
   .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 0.4rem; }
 
-  /* ── EXPERIENCE ── */
+  /* ═══════════════════════════════════
+     EXPERIENCE — smooth transform hover
+  ═══════════════════════════════════ */
   #experience { transition: background 0.4s; }
   .exp-list { margin-top: 4rem; }
+
   .exp-item {
-    display: grid; grid-template-columns: 200px 1fr; gap: 3rem;
-    padding: 2.5rem 0; border-top: 1px solid var(--border);
-    position: relative; transition: padding-left 0.3s;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 3rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+    /* GPU-composited transform — no layout reflow */
+    transform: translateX(0);
+    transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    will-change: transform;
   }
-  .exp-item:hover { padding-left: 1rem; }
+  .exp-item:hover { transform: translateX(14px); }
+
+  /* accent bar that grows in from the left edge */
+  .exp-item::before {
+    content: '';
+    position: absolute;
+    left: -18px;      /* sits just outside the text area */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    border-radius: 2px;
+  }
+  .exp-item:hover::before { transform: scaleY(1); }
+
   .exp-item:last-child { border-bottom: 1px solid var(--border); }
+
   .exp-date { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 2px; color: var(--muted); padding-top: 0.4rem; }
   .exp-role { font-size: 1.25rem; font-weight: 700; color: var(--text); margin-bottom: 0.3rem; }
   .exp-company { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem; letter-spacing: 1px; }
@@ -253,7 +281,7 @@
   .tag {
     font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; letter-spacing: 1px;
     padding: 0.3rem 0.8rem; border: 1px solid var(--border); color: var(--muted);
-    text-transform: uppercase; transition: border-color 0.2s, color 0.2s;
+    text-transform: uppercase; transition: border-color 0.3s, color 0.3s;
   }
   .exp-item:hover .tag { border-color: rgba(245,166,35,0.35); color: var(--accent); }
   [data-theme="light"] .exp-item:hover .tag { border-color: rgba(180,83,9,0.3); }
@@ -352,9 +380,7 @@
   @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
 
-  /* ══════════════════════════════════════
-     RESPONSIVE — TABLET  (≤ 1024px)
-  ══════════════════════════════════════ */
+  /* ══ TABLET ══ */
   @media (max-width: 1024px) {
     nav { padding: 1.1rem 2.5rem; }
     section { padding: 7rem 2.5rem; }
@@ -365,45 +391,31 @@
     .projects-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  /* ══════════════════════════════════════
-     RESPONSIVE — MOBILE  (≤ 768px)
-  ══════════════════════════════════════ */
+  /* ══ MOBILE ══ */
   @media (max-width: 768px) {
-
-    /* Cursor off */
     #cursor, #cursor-ring { display: none; }
     body { cursor: auto; }
 
-    /* Nav */
     nav { padding: 1rem 1.25rem; }
     .nav-links { display: none; }
     .nav-hamburger { display: flex; }
     .mobile-menu { display: flex; }
-    #theme-toggle { display: none; } /* shown inside mobile menu */
+    #theme-toggle { display: none; }
     .nav-right { gap: 0.8rem; }
 
-    /* Hero */
     #hero { padding: 0 1.25rem 3.5rem; min-height: 100dvh; }
     .hero-tag { font-size: 0.62rem; letter-spacing: 2px; margin-bottom: 1rem; }
-    .hero-name {
-      font-size: clamp(3.8rem, 20vw, 6.5rem);
-      line-height: 0.88; letter-spacing: -1px;
-    }
-    .hero-sub {
-      margin-top: 1.5rem; flex-direction: column;
-      align-items: flex-start; gap: 1.5rem;
-    }
+    .hero-name { font-size: clamp(3.8rem, 20vw, 6.5rem); line-height: 0.88; letter-spacing: -1px; }
+    .hero-sub { margin-top: 1.5rem; flex-direction: column; align-items: flex-start; gap: 1.5rem; }
     .hero-desc { max-width: 100%; font-size: 0.9rem; }
     .hero-cta { padding: 0.85rem 1.6rem; font-size: 0.75rem; }
     .hero-scroll { display: none; }
     .orb1 { width: 280px; height: 280px; top: -60px; right: -60px; }
     .orb2 { width: 200px; height: 200px; }
 
-    /* Sections */
     section { padding: 5rem 1.25rem; }
     .section-title { font-size: clamp(2.4rem, 11vw, 4rem); }
 
-    /* About */
     #about { padding: 5rem 1.25rem; }
     .about-grid { grid-template-columns: 1fr; gap: 2.5rem; margin-top: 2.5rem; }
     .about-text p { font-size: 0.95rem; }
@@ -412,65 +424,45 @@
     .stat-number { font-size: 2.8rem; }
     .stat-label { font-size: 0.62rem; }
 
-    /* Experience */
     #experience { padding: 5rem 1.25rem; }
     .exp-list { margin-top: 2.5rem; }
+    /* On mobile, disable the slide — too disorienting on touch */
     .exp-item {
       grid-template-columns: 1fr;
       gap: 0.4rem;
       padding: 1.8rem 0;
+      transition: none;
     }
-    .exp-item:hover { padding-left: 0; }
+    .exp-item:hover { transform: none; }
+    .exp-item::before { display: none; }
     .exp-date { font-size: 0.65rem; }
     .exp-role { font-size: 1.1rem; }
     .exp-company { font-size: 0.75rem; }
     .exp-desc { font-size: 0.87rem; }
 
-    /* Projects */
     #projects { padding: 5rem 1.25rem; }
-    .projects-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5px;
-      margin-top: 2.5rem;
-    }
+    .projects-grid { grid-template-columns: 1fr; gap: 1.5px; margin-top: 2.5rem; }
     .project-card { padding: 1.8rem 1.5rem; }
     .project-num { font-size: 3rem; margin-bottom: 1rem; }
     .project-title { font-size: 1.15rem; }
     .project-stack { font-size: 0.65rem; }
     .project-desc { font-size: 0.85rem; }
-    .project-link-secondary { display: none; } /* too long for mobile */
+    .project-link-secondary { display: none; }
 
-    /* Skills */
     #skills { padding: 5rem 1.25rem; }
     .skills-wrapper { margin-top: 2.5rem; }
     .skill-pill { font-size: 0.72rem; padding: 0.5rem 1rem; }
     .skill-category { margin-bottom: 2rem; }
 
-    /* Contact */
     #contact { padding: 6rem 1.25rem; text-align: left; }
-    .contact-big {
-      font-size: clamp(3.8rem, 18vw, 7rem);
-      margin-bottom: 2rem; text-align: left;
-    }
-    .contact-links {
-      flex-direction: column; align-items: stretch; gap: 0.8rem;
-    }
-    .contact-link {
-      font-size: 0.72rem; letter-spacing: 1px;
-      padding: 0.9rem 1.3rem; justify-content: flex-start;
-      word-break: break-all;
-    }
+    .contact-big { font-size: clamp(3.8rem, 18vw, 7rem); margin-bottom: 2rem; text-align: left; }
+    .contact-links { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+    .contact-link { font-size: 0.72rem; letter-spacing: 1px; padding: 0.9rem 1.3rem; justify-content: flex-start; word-break: break-all; }
 
-    /* Footer */
-    footer {
-      padding: 1.8rem 1.25rem;
-      flex-direction: column; gap: 0.8rem; text-align: center;
-    }
+    footer { padding: 1.8rem 1.25rem; flex-direction: column; gap: 0.8rem; text-align: center; }
   }
 
-  /* ══════════════════════════════════════
-     RESPONSIVE — SMALL PHONE  (≤ 400px)
-  ══════════════════════════════════════ */
+  /* ══ SMALL PHONE ══ */
   @media (max-width: 400px) {
     .hero-name { font-size: clamp(3.2rem, 22vw, 5rem); }
     .hero-tag { font-size: 0.57rem; letter-spacing: 1.5px; }
@@ -807,7 +799,7 @@
 </footer>
 
 <script>
-  /* ── Cursor (desktop) ── */
+  /* ── Cursor ── */
   const cursor = document.getElementById('cursor');
   const ring   = document.getElementById('cursor-ring');
   let mx = 0, my = 0, rx = 0, ry = 0;
@@ -887,7 +879,6 @@
     document.body.style.overflow = menuOpen ? 'hidden' : '';
   });
 
-  /* Close button inside menu */
   document.getElementById('menuClose').addEventListener('click', () => {
     menuOpen = false;
     hamburger.classList.remove('open');
@@ -895,7 +886,6 @@
     document.body.style.overflow = '';
   });
 
-  /* Close menu when a link is clicked */
   document.querySelectorAll('.mob-link').forEach(link => {
     link.addEventListener('click', () => {
       menuOpen = false;
