@@ -42,7 +42,6 @@
       --orb2-color: rgba(22, 163, 74, 0.05);
       --grid-line: rgba(180, 83, 9, 0.05);
       --stroke-color: var(--text);
-      /* FIX 2: was rgba(0,0,0,0.1) — nearly invisible on light bg */
       --contact-stroke: rgba(28, 23, 16, 0.38);
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -115,7 +114,6 @@
       top: 0;
       left: 0;
       right: 0;
-      /* FIX 1: raised from 100 → 300 so it always sits above the mobile menu overlay (z-index: 150) */
       z-index: 300;
       display: flex;
       align-items: center;
@@ -167,7 +165,6 @@
       border: none;
       cursor: pointer;
       padding: 6px;
-      /* FIX 1: ensure button is always clickable above mobile menu */
       position: relative;
       z-index: 400;
     }
@@ -199,13 +196,30 @@
     .mobile-menu.open { opacity: 1; pointer-events: all; }
     .mobile-menu a {
       font-family: "Bebas Neue", sans-serif;
-      font-size: 3rem;
+      font-size: 2rem;
       letter-spacing: 4px;
       color: var(--muted);
       text-decoration: none;
       transition: color 0.2s;
     }
     .mobile-menu a:hover { color: var(--accent); }
+    /* Mobile theme toggle inside mobile menu */
+    .mobile-theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      padding: 0.6rem 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.3s;
+      margin-top: 0.5rem;
+    }
+    .mobile-theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
     #hero {
       min-height: auto;
       display: flex;
@@ -517,7 +531,6 @@
     [data-theme="light"] .skill-pill.highlight { border-color: rgba(180, 83, 9, 0.35); background: rgba(180, 83, 9, 0.05); }
     #contact { background: var(--bg); position: relative; overflow: hidden; text-align: center; padding: 6rem 4rem; transition: background 0.4s; }
     .contact-big { font-family: "Bebas Neue", sans-serif; font-size: clamp(4rem, 13vw, 12rem); line-height: 0.9; letter-spacing: 2px; margin-bottom: 3rem; }
-    /* FIX 2: stroke text — transparent fill with outlined stroke for "CONNECT" */
     .contact-big .stroke { -webkit-text-stroke: 1.5px var(--contact-stroke); color: transparent; display: block; }
     .contact-links { display: flex; justify-content: center; align-items: center; gap: 1.2rem; flex-wrap: wrap; }
     .contact-link {
@@ -543,7 +556,6 @@
     .ticker-wrap { padding: 1rem 0; background: var(--accent); overflow: hidden; white-space: nowrap; transition: background 0.4s; }
     .ticker { display: inline-flex; animation: ticker 25s linear infinite; }
     .ticker-item { font-family: "Bebas Neue", sans-serif; font-size: 1rem; letter-spacing: 4px; color: var(--bg); padding: 0 2rem; transition: color 0.4s; }
-    /* FIX 3: ticker text on light mode — bg becomes very light, use a dark override */
     [data-theme="light"] .ticker-item { color: #faf7f0; }
     .ticker-sep { color: rgba(0, 0, 0, 0.3); }
     .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
@@ -638,6 +650,10 @@
       <a href="#projects">Work</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
+      <button class="mobile-theme-toggle" aria-label="Toggle theme">
+        <span>&#9728;&#65039;</span>
+        <span>LIGHT</span>
+      </button>
     </div>
 
     <nav>
@@ -940,14 +956,23 @@
   </div>
 
   <script>
-    // Theme toggle
+    // Theme toggle — shared logic for both desktop and mobile buttons
     const wrapper = document.querySelector('.portfolio-wrapper');
-    const themeBtn = document.querySelector('.theme-toggle');
-    themeBtn?.addEventListener('click', () => {
-      const current = wrapper.getAttribute('data-theme');
-      wrapper.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-      themeBtn.querySelector('span:first-child').textContent = current === 'dark' ? '🌙' : '☀️';
-      themeBtn.querySelector('span:last-child').textContent = current === 'dark' ? 'DARK' : 'LIGHT';
+
+    function applyTheme(newTheme) {
+      wrapper.setAttribute('data-theme', newTheme);
+      const isDark = newTheme === 'dark';
+      document.querySelectorAll('.theme-toggle, .mobile-theme-toggle').forEach(btn => {
+        btn.querySelector('span:first-child').textContent = isDark ? '☀️' : '🌙';
+        btn.querySelector('span:last-child').textContent = isDark ? 'LIGHT' : 'DARK';
+      });
+    }
+
+    document.querySelectorAll('.theme-toggle, .mobile-theme-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const current = wrapper.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
     });
 
     // Mobile menu
